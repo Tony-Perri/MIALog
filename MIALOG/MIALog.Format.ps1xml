@@ -165,6 +165,89 @@
       </TableControl>
     </View>
     <View>
+      <Name>MIAReportFileActivityByTaskrun</Name>
+      <ViewSelectedBy>
+        <TypeName>MIAReportFileActivity</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <Label>Task Run</Label>
+        <ScriptBlock>$_.TaskName,$_.NominalStart -join ' at '</ScriptBlock>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Log Time</Label>
+            <Width>11</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>                    
+          <TableColumnHeader>
+            <Label>Action</Label>
+            <Width>10</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Src. Path</Label>
+            <Width>40</Width>
+          </TableColumnHeader><TableColumnHeader>
+            <Label>Dest. Path</Label>
+            <Width>40</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Result</Label>
+            <Width>12</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Size</Label>
+            <Width>12</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <ScriptBlock>"{0,11:h:mm:ss tt}" -f [DateTime]::Parse($_.LogStamp)</ScriptBlock>
+              </TableColumnItem>                            
+              <TableColumnItem>
+                <PropertyName>Action</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>SourcePath</PropertyName>
+              </TableColumnItem><TableColumnItem>
+                <PropertyName>DestPath</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  if($_.StatusCode -eq 0) {
+                    "Success"
+                  }
+                  else {
+                    "$($_.StatusMsg)"
+                  }
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  switch($_.DestBytes)
+                  {
+                    { $_ -gt 1tb }
+                            { "{0:n0} TB" -f ($_ / 1tb);break }
+                    { $_ -gt 1gb }
+                            { "{0:n0} GB" -f ($_ / 1gb);break }
+                    { $_ -gt 1mb }
+                            { "{0:n0} MB" -f ($_ / 1mb);break }
+                    { $_ -gt 1kb }
+                            { "{0:n0} KB" -f ($_ / 1Kb);break }
+                    { $_ -gt 1 }
+                            { "{0} B" -f $_}
+                  }
+                </ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
       <Name>MIAReportAudit</Name>
       <ViewSelectedBy>
         <TypeName>MIAReportAudit</TypeName>

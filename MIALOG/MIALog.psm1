@@ -147,7 +147,7 @@ function Get-MIATaskRun
         Get-MIATaskRun
         Get 100 task run items using default query
     .EXAMPLE
-        Get-MIATaskRun -Predicate "statuscode==0" -MaxCount 10
+        Get-MIATaskRun -Predicate 'Status=in=("Success","Failure")' -MaxCount 10
         Get 10 task run items using a predicate in rsql format
     .EXAMPLE
         Get-MIATaskRun -StartTimeStart (Get-Date).Date -Status Success,Failure
@@ -170,7 +170,8 @@ function Get-MIATaskRun
         [ValidateNotNullOrEmpty()]
         [string]$Predicate = 'Status=in=("Success","Failure")',
 
-        # Filter by taskname(s) ==, =in=
+        # Filter by taskname ==, =like=. Accepts * and ? for wildcards.
+        # Filter by tasknames =in=.
         [Parameter(Mandatory=$false, ParameterSetName='BuildRsql')]
         [ValidateNotNullOrEmpty()]
         [string[]]$Taskname,
@@ -219,6 +220,9 @@ function Get-MIATaskRun
                 Taskname {
                     if ($Taskname.Count -gt 1) {
                         'Taskname=in=("{0}")' -f ($Taskname -join '","')
+                    }
+                    elseif ($Taskname -match '[\*\?]') {                        
+                        'Taskname=like="{0}"' -f $Taskname -replace '\*', '%' -replace '\?', '_'
                     }
                     else {
                         'Taskname=="{0}"' -f $Taskname
@@ -317,7 +321,7 @@ function Get-MIAFileActivity
         [ValidateNotNullOrEmpty()]
         [string]$Predicate = 'StatusCode=out=("5000","5001")',
 
-        # Filter by taskname(s) ==,=in=
+        # Filter by taskname(s) ==, =like=, =in=
         [Parameter(Mandatory=$false, ParameterSetName='BuildRsql')]
         [ValidateNotNullOrEmpty()]
         [string[]]$Taskname,
@@ -361,6 +365,9 @@ function Get-MIAFileActivity
                 Taskname {
                     if ($Taskname.Count -gt 1) {
                         'Taskname=in=("{0}")' -f ($Taskname -join '","')
+                    }
+                    elseif ($Taskname -match '[\*\?]') {                        
+                        'Taskname=like="{0}"' -f $Taskname -replace '\*', '%' -replace '\?', '_'
                     }
                     else {
                         'Taskname=="{0}"' -f $Taskname
